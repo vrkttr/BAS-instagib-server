@@ -13,6 +13,7 @@ This repository contains no program code, only the Docker configuration for the 
 
 1. [Requirements](#requirements)
 2. [Quick start (5 minutes)](#quick-start)
+   - [Windows: one-click server (.exe)](#windows-one-click-server)
 3. [Settings](#settings)
 4. [Firewall and ports](#firewall-and-ports)
 5. [Multiple servers on one machine](#multiple-servers-on-one-machine)
@@ -71,6 +72,41 @@ After about 10 seconds the log shows:
 ```
 
 From then on the server is listed in the game under **Play → Server browser**.
+
+## Windows: one-click server
+
+For Windows there is a ready-made launcher: **[BAS-Instagib-Server.exe](https://github.com/vrkttr/BAS-instagib-server/releases/latest/download/BAS-Instagib-Server.exe)**
+(always the latest release, built automatically by GitHub Actions from the `windows/` folder).
+
+1. Create an empty folder, e.g. `C:\BAS-Server`, and put the exe into it.
+2. Double-click the exe. On the first start it asks for the settings and saves them in `config.env`
+   next to the exe. On later starts you can press `E` to change them (or start the exe with `--setup`).
+3. The launcher starts a **portable Docker engine**, pulls a **fresh** copy of the server image
+   (the local image is deleted first, so nothing is reused from the cache) and starts the server.
+   The window shows the server log.
+4. **Closing the window stops the server** and the engine.
+
+Everything lives in the folder of the exe:
+
+| Path | Contents |
+|---|---|
+| `config.env` | your settings (same keys as `.env.example`) |
+| `maps\` | custom maps (`.basc`), see [Custom maps](#custom-maps) |
+| `engine\` | the portable Docker engine (virtual disk incl. the server ID) – do not delete, or the server gets a new ID |
+
+Requirements and notes:
+
+- Windows 10 2004+ or Windows 11 (x64) with **WSL2**. If WSL is missing, the launcher offers to run
+  `wsl --install --no-distribution` (administrator prompt, then reboot). Docker Desktop is **not** needed.
+- The engine is a private WSL2 distribution (Alpine Linux + Docker Engine) named `BAS-Instagib-xxxxxxxx`;
+  it only runs while the window is open. First start downloads ~300 MB.
+- WSL2 does not forward UDP from your network into Linux by default, so the launcher forwards the UDP port
+  itself. **Allow the firewall prompt** for the exe (private and public networks) and forward the UDP port
+  on your router as described in [Firewall and ports](#firewall-and-ports).
+- If `networkingMode=mirrored` is set in `%USERPROFILE%\.wslconfig` (Windows 11), the server uses the
+  Windows network directly and no forwarding is needed.
+- To remove everything: close the launcher, run `wsl --unregister BAS-Instagib-xxxxxxxx`
+  (name shown by `wsl -l`) and delete the folder.
 
 ## Settings
 
