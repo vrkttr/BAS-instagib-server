@@ -1,0 +1,30 @@
+# © 2026 David Vierkötter (VRKTTR) · BAS: Instagib · All Rights Reserved
+services:
+  server:
+    image: ghcr.io/vrkttr/bas-instagib-server:latest
+    pull_policy: always
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    tmpfs: [/tmp]
+    stop_grace_period: 10s
+    environment:
+      BAS_SERVER_NAME: ${BAS_SERVER_NAME:-BAS Community Server}
+      BAS_MODE: ${BAS_MODE:-dm}
+      BAS_PASSWORD: ${BAS_PASSWORD:-}
+      BAS_MAPS: ${BAS_MAPS:-arena01}
+      BAS_MAX_PLAYERS: ${BAS_MAX_PLAYERS:-12}
+      BAS_UDP_PORT: ${BAS_PORT:-40000}
+      BAS_PUBLIC_IP: ${BAS_PUBLIC_IP:-}
+    ports:
+      - "${BAS_PORT:-40000}:${BAS_PORT:-40000}/udp"
+    volumes:
+      - ./maps:/app/maps:ro
+      - data:/app/data
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "5" }
+
+volumes:
+  data:

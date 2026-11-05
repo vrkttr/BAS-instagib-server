@@ -1,0 +1,64 @@
+# © 2026 David Vierkötter (VRKTTR) · BAS: Instagib · All Rights Reserved
+x-server: &server
+  image: ghcr.io/vrkttr/bas-instagib-server:latest
+  pull_policy: always
+  restart: unless-stopped
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+  tmpfs: [/tmp]
+  stop_grace_period: 10s
+  logging:
+    driver: json-file
+    options: { max-size: "10m", max-file: "5" }
+
+name: bas-server
+
+services:
+  dm-public:
+    <<: *server
+    environment:
+      BAS_SERVER_NAME: "BAS Official · DM"
+      BAS_MODE: dm
+      BAS_UDP_PORT: "40001"
+      BAS_PUBLIC_IP: ${BAS_PUBLIC_IP:-}
+    ports: ["40001:40001/udp"]
+    volumes: ["../maps:/app/maps:ro", "dm-public:/app/data"]
+
+  tdm-public:
+    <<: *server
+    environment:
+      BAS_SERVER_NAME: "BAS Official · TDM"
+      BAS_MODE: tdm
+      BAS_UDP_PORT: "40002"
+      BAS_PUBLIC_IP: ${BAS_PUBLIC_IP:-}
+    ports: ["40002:40002/udp"]
+    volumes: ["../maps:/app/maps:ro", "tdm-public:/app/data"]
+
+  dm-private:
+    <<: *server
+    environment:
+      BAS_SERVER_NAME: "BAS Official · DM · Private"
+      BAS_MODE: dm
+      BAS_PASSWORD: ${BAS_PASSWORD_DM:?set BAS_PASSWORD_DM in examples/.env}
+      BAS_UDP_PORT: "40003"
+      BAS_PUBLIC_IP: ${BAS_PUBLIC_IP:-}
+    ports: ["40003:40003/udp"]
+    volumes: ["../maps:/app/maps:ro", "dm-private:/app/data"]
+
+  tdm-private:
+    <<: *server
+    environment:
+      BAS_SERVER_NAME: "BAS Official · TDM · Private"
+      BAS_MODE: tdm
+      BAS_PASSWORD: ${BAS_PASSWORD_TDM:?set BAS_PASSWORD_TDM in examples/.env}
+      BAS_UDP_PORT: "40004"
+      BAS_PUBLIC_IP: ${BAS_PUBLIC_IP:-}
+    ports: ["40004:40004/udp"]
+    volumes: ["../maps:/app/maps:ro", "tdm-private:/app/data"]
+
+volumes:
+  dm-public:
+  tdm-public:
+  dm-private:
+  tdm-private:
