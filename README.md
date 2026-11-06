@@ -119,7 +119,7 @@ game rules and security features are built into the image and cannot be changed.
 | `BAS_MODE` | `dm` | Game mode: `dm` (deathmatch) or `tdm` (team deathmatch) |
 | `BAS_PORT` | `40000` | UDP port of the server (same port outside and inside) |
 | `BAS_PASSWORD` | empty | Password; empty = public server |
-| `BAS_MAPS` | `arena01` | Map pool, comma-separated (e.g. `arena01,mymap`); players vote after every match |
+| `BAS_MAPS` | `sulfur_gate` | Map pool, comma-separated (e.g. `sulfur_gate,mymap`); players vote after every match |
 | `BAS_MAX_PLAYERS` | `12` | Player limit (1–12) |
 | `BAS_PUBLIC_IP` | automatic | Only set this if automatic detection is wrong (see logs) |
 
