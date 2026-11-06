@@ -13,7 +13,7 @@ services:
       BAS_SERVER_NAME: ${BAS_SERVER_NAME:-BAS Community Server}
       BAS_MODE: ${BAS_MODE:-dm}
       BAS_PASSWORD: ${BAS_PASSWORD:-}
-      BAS_MAPS: ${BAS_MAPS:-arena01}
+      BAS_MAPS: ${BAS_MAPS:-sulfur_gate}
       BAS_MAX_PLAYERS: ${BAS_MAX_PLAYERS:-12}
       BAS_UDP_PORT: ${BAS_PORT:-40000}
       BAS_PUBLIC_IP: ${BAS_PUBLIC_IP:-}
