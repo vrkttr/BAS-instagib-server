@@ -185,7 +185,7 @@ volume, and add the volume under `volumes:` at the bottom.
 
 1. Build a map in the BAS map editor (<https://mapeditor.bas-instagib.com>), bake it and export it as `.basc`.
 2. Put the file into the `maps/` folder, e.g. `maps/mymap.basc`.
-3. Add it to `.env`: `BAS_MAPS=arena01,mymap`
+3. Add it to `.env`: `BAS_MAPS=sulfur_gate,mymap`
 4. `docker compose up -d`
 
 Players download the map automatically through the master server when they join. The file name
