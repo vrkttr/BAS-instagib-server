@@ -161,8 +161,8 @@ free slot for a real player:
   player – even if you play alone against bots. Kills against bots count like kills against players. For the
   rating, bots count as opponents with a fixed rating between 900 ("medium") and 1600 ("really good").
   Bots themselves have no account and never appear in leaderboards.
-- The server browser shows bots separately (`3/12 +8 bots`); only real players count as players.
-  The scoreboard shows `BOT` instead of a ping.
+- In the server browser bots count as players (`11/12`); the player list on the right shows them as
+  `Name [BOT]`. The in-game scoreboard shows `BOT` instead of a ping.
 
 Example `.env` for a server that never feels empty but leaves room for players:
 
@@ -226,7 +226,9 @@ volume, and add the volume under `volumes:` at the bottom. To give a server bots
 `sulfur_gate` and `iron_lung` are built into the image. Custom maps are made with the **BAS map editor** in
 the browser: <https://mapeditor.bas-instagib.com> – nothing to install.
 
-1. **Build** the map from the modular parts (floors, walls, stairs, ramps, platforms, pillars, doorways …).
+1. **Build** the map from the modular parts (floors, walls, stairs, ramps, platforms, pillars, doorways,
+   jump pads …). A **jump pad** launches players straight up – one floor (≈ 9 m) or half a floor (≈ 4.5 m);
+   leave open space above it and put the target edge 2–3 m to the side.
    The editor checks the map while you work. A map needs **spawn points** (for TDM ideally with team
    spawns `cyan` / `orange`) and **ad panels** at clearly visible spots (16:9, 4:3 or 9:16; the editor warns
    when a finished map has none). Use kill volumes for pits and abysses.
