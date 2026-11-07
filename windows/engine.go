@@ -209,6 +209,8 @@ func (e *Engine) RunServer(ctx context.Context, c Config, mapsDir string) error 
 		"-e", "BAS_PASSWORD=" + c.Password,
 		"-e", "BAS_MAPS=" + c.Maps,
 		"-e", fmt.Sprintf("BAS_MAX_PLAYERS=%d", c.MaxPlayers),
+		"-e", fmt.Sprintf("BAS_BOTS=%t", c.Bots),
+		"-e", fmt.Sprintf("BAS_MAX_BOTS=%d", c.MaxBots),
 		"-e", fmt.Sprintf("BAS_UDP_PORT=%d", c.Port),
 		"-e", "BAS_PUBLIC_IP=" + c.PublicIP,
 		"-v", dataVolume + ":/app/data",
