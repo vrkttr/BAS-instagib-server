@@ -22,6 +22,8 @@ type Config struct {
 	Password   string
 	Maps       string
 	MaxPlayers int
+	Bots       bool
+	MaxBots    int
 	PublicIP   string
 }
 
@@ -30,8 +32,9 @@ func defaultConfig() Config {
 		ServerName: "BAS Community Server",
 		Mode:       "dm",
 		Port:       40000,
-		Maps:       "arena01",
+		Maps:       "sulfur_gate",
 		MaxPlayers: 12,
+		MaxBots:    11,
 	}
 }
 
@@ -74,6 +77,17 @@ func loadConfig(path string) (Config, error) {
 			if n, err := strconv.Atoi(v); err == nil {
 				c.MaxPlayers = n
 			}
+		case "BAS_BOTS":
+			switch strings.ToLower(v) {
+			case "true", "1", "yes", "ja", "y":
+				c.Bots = true
+			default:
+				c.Bots = false
+			}
+		case "BAS_MAX_BOTS":
+			if n, err := strconv.Atoi(v); err == nil {
+				c.MaxBots = n
+			}
 		case "BAS_PUBLIC_IP":
 			c.PublicIP = v
 		}
@@ -91,6 +105,8 @@ func saveConfig(path string, c Config) error {
 	fmt.Fprintf(&b, "BAS_PASSWORD=%s\r\n", c.Password)
 	fmt.Fprintf(&b, "BAS_MAPS=%s\r\n", c.Maps)
 	fmt.Fprintf(&b, "BAS_MAX_PLAYERS=%d\r\n", c.MaxPlayers)
+	fmt.Fprintf(&b, "BAS_BOTS=%t\r\n", c.Bots)
+	fmt.Fprintf(&b, "BAS_MAX_BOTS=%d\r\n", c.MaxBots)
 	fmt.Fprintf(&b, "BAS_PUBLIC_IP=%s\r\n", c.PublicIP)
 	tmp := path + ".tmp"
 	if err := os.WriteFile(tmp, []byte(b.String()), 0o600); err != nil {
@@ -117,6 +133,9 @@ func (c Config) validate() error {
 	}
 	if c.MaxPlayers < 1 || c.MaxPlayers > 12 {
 		return fmt.Errorf("BAS_MAX_PLAYERS must be between 1 and 12")
+	}
+	if c.MaxBots < 0 || c.MaxBots > 11 {
+		return fmt.Errorf("BAS_MAX_BOTS must be between 0 and 11")
 	}
 	if strings.TrimSpace(c.Maps) == "" {
 		return fmt.Errorf("BAS_MAPS must not be empty")
@@ -155,6 +174,11 @@ func (c Config) print() {
 	fmt.Printf("  Password    : %s\n", pw)
 	fmt.Printf("  Maps        : %s\n", c.Maps)
 	fmt.Printf("  Max players : %d\n", c.MaxPlayers)
+	if c.Bots {
+		fmt.Printf("  Bots        : on (at most %d)\n", c.MaxBots)
+	} else {
+		fmt.Printf("  Bots        : off\n")
+	}
 	fmt.Printf("  Public IP   : %s\n", ip)
 }
 
@@ -173,6 +197,10 @@ func runSetup(c Config) Config {
 		}
 		c.Maps = askString("Map pool, comma-separated", c.Maps)
 		c.MaxPlayers = askInt("Max players (1-12)", c.MaxPlayers)
+		c.Bots = askBool("Fill empty slots with bots (y/n)", c.Bots)
+		if c.Bots {
+			c.MaxBots = askInt("Max bots (0-11)", c.MaxBots)
+		}
 		ip := askString("Public IPv4 (empty = automatic, '-' = automatic)", c.PublicIP)
 		if ip == "-" {
 			ip = ""
@@ -201,6 +229,22 @@ func askString(label, def string) string {
 		return def
 	}
 	return line
+}
+
+func askBool(label string, def bool) bool {
+	d := "n"
+	if def {
+		d = "y"
+	}
+	for {
+		switch strings.ToLower(askString(label, d)) {
+		case "y", "yes", "j", "ja", "true", "1":
+			return true
+		case "n", "no", "nein", "false", "0":
+			return false
+		}
+		fmt.Println("  Please enter y or n.")
+	}
 }
 
 func askInt(label string, def int) int {
