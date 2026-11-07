@@ -15,16 +15,17 @@ This repository contains no program code, only the Docker configuration for the 
 2. [Quick start (5 minutes)](#quick-start)
    - [Windows: one-click server (.exe)](#windows-one-click-server)
 3. [Settings](#settings)
-4. [Firewall and ports](#firewall-and-ports)
-5. [Multiple servers on one machine](#multiple-servers-on-one-machine)
-6. [Custom maps](#custom-maps)
-7. [Updates](#updates)
-8. [Reading logs and troubleshooting](#reading-logs-and-troubleshooting)
-9. [Server ID and verification ✓](#server-id-and-verification)
-10. [Why a modified image is not listed](#integrity-check)
-11. [Resource usage](#resource-usage)
-12. [Stopping and removing the server](#stopping-and-removing-the-server)
-13. [Legal](#legal)
+4. [Bots](#bots)
+5. [Firewall and ports](#firewall-and-ports)
+6. [Multiple servers on one machine](#multiple-servers-on-one-machine)
+7. [Maps and the map editor](#maps-and-the-map-editor)
+8. [Updates](#updates)
+9. [Reading logs and troubleshooting](#reading-logs-and-troubleshooting)
+10. [Server ID and verification ✓](#server-id-and-verification)
+11. [Why a modified image is not listed](#integrity-check)
+12. [Resource usage](#resource-usage)
+13. [Stopping and removing the server](#stopping-and-removing-the-server)
+14. [Legal](#legal)
 
 ---
 
@@ -79,8 +80,9 @@ For Windows there is a ready-made launcher: **[BAS-Instagib-Server.exe](https://
 (always the latest release, built automatically by GitHub Actions from the `windows/` folder).
 
 1. Create an empty folder, e.g. `C:\BAS-Server`, and put the exe into it.
-2. Double-click the exe. On the first start it asks for the settings and saves them in `config.env`
-   next to the exe. On later starts you can press `E` to change them (or start the exe with `--setup`).
+2. Double-click the exe. On the first start it asks for the settings (including whether to fill empty
+   slots with [bots](#bots)) and saves them in `config.env` next to the exe. On later starts you can press
+   `E` to change them (or start the exe with `--setup`).
 3. The launcher starts a **portable Docker engine**, pulls a **fresh** copy of the server image
    (the local image is deleted first, so nothing is reused from the cache) and starts the server.
    The window shows the server log.
@@ -91,7 +93,7 @@ Everything lives in the folder of the exe:
 | Path | Contents |
 |---|---|
 | `config.env` | your settings (same keys as `.env.example`) |
-| `maps\` | custom maps (`.basc`), see [Custom maps](#custom-maps) |
+| `maps\` | custom maps (`.basc`), see [Maps and the map editor](#maps-and-the-map-editor) |
 | `engine\` | the portable Docker engine (virtual disk incl. the server ID) – do not delete, or the server gets a new ID |
 
 Requirements and notes:
@@ -119,17 +121,54 @@ game rules and security features are built into the image and cannot be changed.
 | `BAS_MODE` | `dm` | Game mode: `dm` (deathmatch) or `tdm` (team deathmatch) |
 | `BAS_PORT` | `40000` | UDP port of the server (same port outside and inside) |
 | `BAS_PASSWORD` | empty | Password; empty = public server |
-| `BAS_MAPS` | `sulfur_gate` | Map pool, comma-separated (e.g. `sulfur_gate,mymap`); players vote after every match |
+| `BAS_MAPS` | `sulfur_gate` | Map pool, comma-separated (e.g. `sulfur_gate,iron_lung,mymap`); players vote after every match |
 | `BAS_MAX_PLAYERS` | `12` | Player limit (1–12) |
+| `BAS_BOTS` | `false` | `true` fills empty slots with bots, see [Bots](#bots) |
+| `BAS_MAX_BOTS` | `11` | Upper limit for the number of bots (0–11), e.g. `6` |
 | `BAS_PUBLIC_IP` | automatic | Only set this if automatic detection is wrong (see logs) |
 
-Fixed values: 10-minute time limit, kill limit 25 (DM) / 50 (TDM), automatic team balance,
-warmup until 2 players are present, queue for full servers.
+Built-in maps: `sulfur_gate` and `iron_lung`. Fixed values: 10-minute time limit, kill limit 25 (DM) /
+100 team kills (TDM), automatic team balance, ready check and countdown before every match, queue for full
+servers.
 
 After every change to `.env`:
 
 ```bash
 docker compose up -d
+```
+
+## Bots
+
+With `BAS_BOTS=true` the server fills itself with bots up to **one slot below full**, so there is always a
+free slot for a real player:
+
+| `BAS_MAX_PLAYERS=12` | no `BAS_MAX_BOTS` | `BAS_MAX_BOTS=6` |
+|---|---|---|
+| 0 players | 11 bots | 6 bots |
+| 1 player | 10 bots | 6 bots |
+| 6 players | 5 bots | 5 bots |
+| 11 players | 0 bots | 0 bots |
+
+- When a player joins, a bot leaves **immediately** – players never end up in the queue because of bots.
+  In TDM the bot leaves the larger team.
+- Every bot has a random skill from "medium" to "really good": reaction time, aim, turning speed,
+  field of view, hearing and how much it bunny-hops all depend on it. Every bot also gets a random look
+  (armour parts, colours, weapon skin, beam).
+- Bots move freely through every map. When the server starts, it builds a navigation grid from the map
+  geometry (about one second per map) – this also works for custom maps without any extra preparation.
+- Without real players the server stays in warmup; bots alone never play a match.
+- Matches with bots count **exactly like matches without bots**: XP, statistics and skill rating for every
+  player – even if you play alone against bots. Kills against bots count like kills against players. For the
+  rating, bots count as opponents with a fixed rating between 900 ("medium") and 1600 ("really good").
+  Bots themselves have no account and never appear in leaderboards.
+- The server browser shows bots separately (`3/12 +8 bots`); only real players count as players.
+  The scoreboard shows `BOT` instead of a ping.
+
+Example `.env` for a server that never feels empty but leaves room for players:
+
+```
+BAS_BOTS=true
+BAS_MAX_BOTS=6
 ```
 
 ## Firewall and ports
@@ -179,17 +218,37 @@ docker compose -f examples/multi-server.compose.yaml up -d
 ```
 
 To add more servers, copy a block under `services:`, change the name, the port (in both places) and the
-volume, and add the volume under `volumes:` at the bottom.
+volume, and add the volume under `volumes:` at the bottom. To give a server bots, add `BAS_BOTS: "true"`
+(and optionally `BAS_MAX_BOTS: "6"`) to its `environment:` block.
 
-## Custom maps
+## Maps and the map editor
 
-1. Build a map in the BAS map editor (<https://mapeditor.bas-instagib.com>), bake it and export it as `.basc`.
-2. Put the file into the `maps/` folder, e.g. `maps/mymap.basc`.
-3. Add it to `.env`: `BAS_MAPS=sulfur_gate,mymap`
-4. `docker compose up -d`
+`sulfur_gate` and `iron_lung` are built into the image. Custom maps are made with the **BAS map editor** in
+the browser: <https://mapeditor.bas-instagib.com> – nothing to install.
 
-Players download the map automatically through the master server when they join. The file name
-(without `.basc`) is the map's identifier: letters, digits, `-` and `_` only.
+1. **Build** the map from the modular parts (floors, walls, stairs, ramps, platforms, pillars, doorways …).
+   The editor checks the map while you work. A map needs **spawn points** (for TDM ideally with team
+   spawns `cyan` / `orange`) and **ad panels** at clearly visible spots (16:9, 4:3 or 9:16; the editor warns
+   when a finished map has none). Use kill volumes for pits and abysses.
+2. **Test** it with **▶ Test in game**: the map opens directly in the game, with the real movement, so you
+   can check jumps, stairs and bunny-hop lines before anyone else plays it.
+3. **Bake** the lighting with **☀ Bake**. This runs in your browser on all CPU cores and can take a few
+   minutes, depending on the quality setting. Without a bake the map only has preview lighting.
+4. **Export** with **Export**: you get `<mapname>.basc` (map, collision and baked lighting in one file).
+5. Put the file into the `maps/` folder next to `compose.yaml`, e.g. `maps/mymap.basc`
+   (Windows launcher: the `maps\` folder next to the exe).
+6. Add it to the map pool in `.env`: `BAS_MAPS=sulfur_gate,iron_lung,mymap`
+7. `docker compose up -d`
+
+Notes:
+
+- The **file name** (without `.basc`) is the map's identifier: letters, digits, `-` and `_` only.
+  It must match the entry in `BAS_MAPS` exactly.
+- Players do not need to install anything: they download the map automatically through the master server
+  when they join (up to 64 MB per map).
+- After changing a map, export it again and overwrite the file; players get the new version automatically
+  (the server identifies maps by their content hash).
+- [Bots](#bots) also play custom maps; their navigation is generated automatically from the map.
 
 ## Updates
 
@@ -232,6 +291,8 @@ once per minute (when something changed).
 | `not reachable (wss://masterserver…)` | no internet/DNS on the host, or the master server is briefly offline | check the network; the server keeps retrying on its own |
 | `Configuration error: …` | invalid value in `.env` | the message names the variable and the allowed values |
 | `Map "xyz.basc" not found` | file missing in `maps/` or typo in `BAS_MAPS` | check the file name |
+| `Bot navigation <map>: … nodes` | bots are on, navigation for the map was built | – |
+| `Bot joined: …` / `Bot left: …` | bots fill up or make room for a player | – |
 | `Too many servers from this address` | protection limit of the master server | contact the BAS: Instagib operator |
 | `ID only valid until restart` | volume for `/app/data` is missing | use the compose file from this repository |
 
@@ -250,7 +311,10 @@ On first start the server creates a key (in the `data` volume). The **server ID*
 from it and printed in the log. It stays the same as long as the volume exists.
 
 Verified servers get a **✓** in the server browser. Verification is granted by the BAS: Instagib operator
-based on the server ID. Ranked matches will later only count on verified servers.
+based on the server ID.
+
+**Verified servers** – with or without password, with or without bots – count fully: XP, statistics and
+skill rating. **Servers that are not verified** count for nothing: no XP, no statistics, no rating.
 
 ## Integrity check
 
@@ -266,6 +330,8 @@ mechanisms. The image runs without root privileges on a read-only file system.
 
 Per server with 12 players, roughly: 1 CPU core (128 Hz simulation, plan one core per server),
 150 MB RAM, 1–2 Mbit/s upload. A small VPS with 2 cores easily handles two full servers.
+Bots run on the server itself and need no bandwidth; 11 bots take roughly 1 ms per simulation tick
+(about an eighth of a core) plus about one second per map at startup to build their navigation.
 
 ## Stopping and removing the server
 
