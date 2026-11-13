@@ -32,7 +32,7 @@ func defaultConfig() Config {
 		ServerName: "BAS Community Server",
 		Mode:       "dm",
 		Port:       40000,
-		Maps:       "sulfur_gate",
+		Maps:       "",
 		MaxPlayers: 12,
 		MaxBots:    11,
 	}
@@ -137,12 +137,11 @@ func (c Config) validate() error {
 	if c.MaxBots < 0 || c.MaxBots > 11 {
 		return fmt.Errorf("BAS_MAX_BOTS must be between 0 and 11")
 	}
-	if strings.TrimSpace(c.Maps) == "" {
-		return fmt.Errorf("BAS_MAPS must not be empty")
-	}
-	for _, m := range strings.Split(c.Maps, ",") {
-		if !mapNameRe.MatchString(strings.TrimSpace(m)) {
-			return fmt.Errorf("invalid map name %q in BAS_MAPS (letters, digits, - and _ only)", m)
+	if strings.TrimSpace(c.Maps) != "" {
+		for _, m := range strings.Split(c.Maps, ",") {
+			if !mapNameRe.MatchString(strings.TrimSpace(m)) {
+				return fmt.Errorf("invalid map name %q in BAS_MAPS (letters, digits, - and _ only)", m)
+			}
 		}
 	}
 	if c.PublicIP != "" {
@@ -172,7 +171,11 @@ func (c Config) print() {
 	fmt.Printf("  Mode        : %s\n", c.Mode)
 	fmt.Printf("  UDP port    : %d\n", c.Port)
 	fmt.Printf("  Password    : %s\n", pw)
-	fmt.Printf("  Maps        : %s\n", c.Maps)
+	maps := c.Maps
+	if strings.TrimSpace(maps) == "" {
+		maps = "(automatic – all official maps)"
+	}
+	fmt.Printf("  Maps        : %s\n", maps)
 	fmt.Printf("  Max players : %d\n", c.MaxPlayers)
 	if c.Bots {
 		fmt.Printf("  Bots        : on (at most %d)\n", c.MaxBots)
@@ -195,7 +198,10 @@ func runSetup(c Config) Config {
 		if c.Password == "-" {
 			c.Password = ""
 		}
-		c.Maps = askString("Map pool, comma-separated", c.Maps)
+		c.Maps = askString("Map pool, comma-separated (empty or '-' = all official maps)", c.Maps)
+		if strings.TrimSpace(c.Maps) == "-" {
+			c.Maps = ""
+		}
 		c.MaxPlayers = askInt("Max players (1-12)", c.MaxPlayers)
 		c.Bots = askBool("Fill empty slots with bots (y/n)", c.Bots)
 		if c.Bots {
