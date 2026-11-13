@@ -16,16 +16,17 @@ This repository contains no program code, only the Docker configuration for the 
    - [Windows: one-click server (.exe)](#windows-one-click-server)
 3. [Settings](#settings)
 4. [Bots](#bots)
-5. [Firewall and ports](#firewall-and-ports)
-6. [Multiple servers on one machine](#multiple-servers-on-one-machine)
-7. [Maps and the map editor](#maps-and-the-map-editor)
-8. [Updates](#updates)
-9. [Reading logs and troubleshooting](#reading-logs-and-troubleshooting)
-10. [Server ID and verification ✓](#server-id-and-verification)
-11. [Why a modified image is not listed](#integrity-check)
-12. [Resource usage](#resource-usage)
-13. [Stopping and removing the server](#stopping-and-removing-the-server)
-14. [Legal](#legal)
+5. [Spectators](#spectators)
+6. [Firewall and ports](#firewall-and-ports)
+7. [Multiple servers on one machine](#multiple-servers-on-one-machine)
+8. [Maps and the map editor](#maps-and-the-map-editor)
+9. [Updates](#updates)
+10. [Reading logs and troubleshooting](#reading-logs-and-troubleshooting)
+11. [Server ID and verification ✓](#server-id-and-verification)
+12. [Why a modified image is not listed](#integrity-check)
+13. [Resource usage](#resource-usage)
+14. [Stopping and removing the server](#stopping-and-removing-the-server)
+15. [Legal](#legal)
 
 ---
 
@@ -121,13 +122,28 @@ game rules and security features are built into the image and cannot be changed.
 | `BAS_MODE` | `dm` | Game mode: `dm` (deathmatch) or `tdm` (team deathmatch) |
 | `BAS_PORT` | `40000` | UDP port of the server (same port outside and inside) |
 | `BAS_PASSWORD` | empty | Password; empty = public server |
-| `BAS_MAPS` | `sulfur_gate` | Map pool, comma-separated (e.g. `sulfur_gate,iron_lung,mymap`); players vote after every match |
+| `BAS_MAPS` | empty = all official maps | Map pool, comma-separated (e.g. `sulfur_gate,stone_tech,mymap`); empty = automatic pool, see below. Players vote after every match |
 | `BAS_MAX_PLAYERS` | `12` | Player limit (1–12) |
 | `BAS_BOTS` | `false` | `true` fills empty slots with bots, see [Bots](#bots) |
 | `BAS_MAX_BOTS` | `11` | Upper limit for the number of bots (0–11), e.g. `6` |
 | `BAS_PUBLIC_IP` | automatic | Only set this if automatic detection is wrong (see logs) |
 
-Built-in maps: `sulfur_gate` and `iron_lung`. Fixed values: 10-minute time limit, kill limit 25 (DM) /
+**Map pool:** If `BAS_MAPS` is empty, the server plays **all official maps** built into the image, starts with a
+random one and lets the players vote after every match. New official maps are added automatically with every
+image update. If you set `BAS_MAPS`, only your selection is played – new official maps then have to be added by
+hand. Built-in maps:
+
+| Identifier | Map |
+|---|---|
+| `dark_church` | Dark Church |
+| `iron_lung` | Iron Lung |
+| `stone_tech` | Stone Tech |
+| `sulfur_gate` | Sulfur Gate |
+
+Custom maps from `maps/` are only played if they are listed in `BAS_MAPS` (see
+[Maps and the map editor](#maps-and-the-map-editor)).
+
+Fixed values: 10-minute time limit, kill limit 25 (DM) /
 100 team kills (TDM), automatic team balance, ready check and countdown before every match, queue for full
 servers.
 
@@ -170,6 +186,21 @@ Example `.env` for a server that never feels empty but leaves room for players:
 BAS_BOTS=true
 BAS_MAX_BOTS=6
 ```
+
+## Spectators
+
+Every server accepts **any number of spectators**. They do not take a player slot, do not appear in the
+player list and do not vote; the scoreboard shows how many are watching. Players join as spectators with
+**Spectate** in the server browser or switch with Esc → **Spectate** / **Join the game**.
+
+- Spectating also works on **password-protected servers** without the password (e.g. for e-sports matches).
+  The password is only asked for when switching into the game.
+- Camera: free camera, first-person view of a player, or **Auto**, where the camera picks the best players
+  and shots by itself.
+- For a permanent stream (OBS, Twitch) open `https://bas-instagib.com/?watch=<server ID>&auto` as a browser
+  source: it starts directly as a spectator in Auto mode, without any menu.
+
+Spectators need no configuration and no additional port.
 
 ## Firewall and ports
 
@@ -223,7 +254,7 @@ volume, and add the volume under `volumes:` at the bottom. To give a server bots
 
 ## Maps and the map editor
 
-`sulfur_gate` and `iron_lung` are built into the image. Custom maps are made with the **BAS map editor** in
+The [official maps](#settings) are built into the image. Custom maps are made with the **BAS map editor** in
 the browser: <https://mapeditor.bas-instagib.com> – nothing to install.
 
 1. **Build** the map from the modular parts (floors, walls, stairs, ramps, platforms, pillars, doorways,
@@ -239,7 +270,8 @@ the browser: <https://mapeditor.bas-instagib.com> – nothing to install.
 4. **Export** with **Export**: you get `<mapname>.basc` (map, collision and baked lighting in one file).
 5. Put the file into the `maps/` folder next to `compose.yaml`, e.g. `maps/mymap.basc`
    (Windows launcher: the `maps\` folder next to the exe).
-6. Add it to the map pool in `.env`: `BAS_MAPS=sulfur_gate,iron_lung,mymap`
+6. Add it to the map pool in `.env`, together with the official maps you want to keep:
+   `BAS_MAPS=dark_church,iron_lung,stone_tech,sulfur_gate,mymap` (custom maps are never added automatically)
 7. `docker compose up -d`
 
 Notes:
@@ -251,6 +283,8 @@ Notes:
 - After changing a map, export it again and overwrite the file; players get the new version automatically
   (the server identifies maps by their content hash).
 - [Bots](#bots) also play custom maps; their navigation is generated automatically from the map.
+- Official maps come with the image. Use `docker compose pull && docker compose up -d` to get new or updated
+  official maps; with an empty `BAS_MAPS` they are in the pool right away.
 
 ## Updates
 
@@ -270,7 +304,7 @@ Automatically every night at 4 am (crontab, `crontab -e`):
 0 4 * * * cd /path/to/bas-server && docker compose pull -q && docker compose up -d
 ```
 
-The server ID is kept across updates (volume `data`).
+The server ID is kept across updates (volume `data`). Updates also bring new and updated official maps.
 
 ## Reading logs and troubleshooting
 
@@ -292,6 +326,7 @@ once per minute (when something changed).
 | `Master server protocol … not supported` | image is outdated | update (see above) |
 | `not reachable (wss://masterserver…)` | no internet/DNS on the host, or the master server is briefly offline | check the network; the server keeps retrying on its own |
 | `Configuration error: …` | invalid value in `.env` | the message names the variable and the allowed values |
+| `Map pool: automatic (BAS_MAPS not set) – …` | `BAS_MAPS` is empty, all official maps are played | – |
 | `Map "xyz.basc" not found` | file missing in `maps/` or typo in `BAS_MAPS` | check the file name |
 | `Bot navigation <map>: … nodes` | bots are on, navigation for the map was built | – |
 | `Bot joined: …` / `Bot left: …` | bots fill up or make room for a player | – |
@@ -315,8 +350,8 @@ from it and printed in the log. It stays the same as long as the volume exists.
 Verified servers get a **✓** in the server browser. Verification is granted by the BAS: Instagib operator
 based on the server ID.
 
-**Verified servers** – with or without password, with or without bots – count fully: XP, statistics and
-skill rating. **Servers that are not verified** count for nothing: no XP, no statistics, no rating.
+**Verified servers** – with or without password, with or without bots – count fully: XP, daily challenges,
+statistics and skill rating. **Servers that are not verified** count for nothing: no XP, no challenges, no statistics, no rating.
 
 ## Integrity check
 

@@ -13,7 +13,7 @@ services:
       BAS_SERVER_NAME: ${BAS_SERVER_NAME:-BAS Community Server}
       BAS_MODE: ${BAS_MODE:-dm}
       BAS_PASSWORD: ${BAS_PASSWORD:-}
-      BAS_MAPS: ${BAS_MAPS:-sulfur_gate}
+      BAS_MAPS: ${BAS_MAPS:-}
       BAS_MAX_PLAYERS: ${BAS_MAX_PLAYERS:-12}
       BAS_BOTS: ${BAS_BOTS:-false}
       BAS_MAX_BOTS: ${BAS_MAX_BOTS:-11}
