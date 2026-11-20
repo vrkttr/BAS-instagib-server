@@ -24,6 +24,8 @@ type Config struct {
 	MaxPlayers int
 	Bots       bool
 	MaxBots    int
+	FragLimit  int // 0 = default of the mode (25 kills DM / 100 team kills TDM)
+	TimeLimit  int // minutes, 0 = default (10)
 	PublicIP   string
 }
 
@@ -88,6 +90,14 @@ func loadConfig(path string) (Config, error) {
 			if n, err := strconv.Atoi(v); err == nil {
 				c.MaxBots = n
 			}
+		case "BAS_FRAG_LIMIT":
+			if n, err := strconv.Atoi(v); err == nil {
+				c.FragLimit = n
+			}
+		case "BAS_TIME_LIMIT":
+			if n, err := strconv.Atoi(v); err == nil {
+				c.TimeLimit = n
+			}
 		case "BAS_PUBLIC_IP":
 			c.PublicIP = v
 		}
@@ -107,6 +117,8 @@ func saveConfig(path string, c Config) error {
 	fmt.Fprintf(&b, "BAS_MAX_PLAYERS=%d\r\n", c.MaxPlayers)
 	fmt.Fprintf(&b, "BAS_BOTS=%t\r\n", c.Bots)
 	fmt.Fprintf(&b, "BAS_MAX_BOTS=%d\r\n", c.MaxBots)
+	fmt.Fprintf(&b, "BAS_FRAG_LIMIT=%s\r\n", limitValue(c.FragLimit))
+	fmt.Fprintf(&b, "BAS_TIME_LIMIT=%s\r\n", limitValue(c.TimeLimit))
 	fmt.Fprintf(&b, "BAS_PUBLIC_IP=%s\r\n", c.PublicIP)
 	tmp := path + ".tmp"
 	if err := os.WriteFile(tmp, []byte(b.String()), 0o600); err != nil {
@@ -136,6 +148,12 @@ func (c Config) validate() error {
 	}
 	if c.MaxBots < 0 || c.MaxBots > 11 {
 		return fmt.Errorf("BAS_MAX_BOTS must be between 0 and 11")
+	}
+	if c.FragLimit < 0 || c.FragLimit > 999 {
+		return fmt.Errorf("BAS_FRAG_LIMIT must be between 1 and 999, or empty for the default")
+	}
+	if c.TimeLimit < 0 || c.TimeLimit > 60 {
+		return fmt.Errorf("BAS_TIME_LIMIT must be between 1 and 60 minutes, or empty for the default")
 	}
 	if strings.TrimSpace(c.Maps) != "" {
 		for _, m := range strings.Split(c.Maps, ",") {
@@ -182,6 +200,16 @@ func (c Config) print() {
 	} else {
 		fmt.Printf("  Bots        : off\n")
 	}
+	frags := "(default: 25 kills DM / 100 team kills TDM)"
+	if c.FragLimit > 0 {
+		frags = strconv.Itoa(c.FragLimit)
+	}
+	fmt.Printf("  Frag limit  : %s\n", frags)
+	mins := "(default: 10 minutes)"
+	if c.TimeLimit > 0 {
+		mins = fmt.Sprintf("%d minutes", c.TimeLimit)
+	}
+	fmt.Printf("  Time limit  : %s\n", mins)
 	fmt.Printf("  Public IP   : %s\n", ip)
 }
 
@@ -207,6 +235,8 @@ func runSetup(c Config) Config {
 		if c.Bots {
 			c.MaxBots = askInt("Max bots (0-11)", c.MaxBots)
 		}
+		c.FragLimit = askInt("Frag limit (0 = default: 25 DM / 100 TDM)", c.FragLimit)
+		c.TimeLimit = askInt("Time limit in minutes (0 = default: 10)", c.TimeLimit)
 		ip := askString("Public IPv4 (empty = automatic, '-' = automatic)", c.PublicIP)
 		if ip == "-" {
 			ip = ""
@@ -262,4 +292,13 @@ func askInt(label string, def int) int {
 		}
 		fmt.Println("  Please enter a number.")
 	}
+}
+
+// limitValue renders a frag/time limit for config.env and the container:
+// 0 means "use the built-in default" and is written as an empty value.
+func limitValue(n int) string {
+	if n <= 0 {
+		return ""
+	}
+	return strconv.Itoa(n)
 }
