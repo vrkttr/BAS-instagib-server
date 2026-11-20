@@ -114,7 +114,7 @@ Requirements and notes:
 ## Settings
 
 All settings live in the `.env` file. There are deliberately no others: the master server address, tick rate,
-game rules and security features are built into the image and cannot be changed.
+the remaining game rules and security features are built into the image and cannot be changed.
 
 | Variable | Default | Meaning |
 |---|---|---|
@@ -126,6 +126,8 @@ game rules and security features are built into the image and cannot be changed.
 | `BAS_MAX_PLAYERS` | `12` | Player limit (1–12) |
 | `BAS_BOTS` | `false` | `true` fills empty slots with bots, see [Bots](#bots) |
 | `BAS_MAX_BOTS` | `11` | Upper limit for the number of bots (0–11), e.g. `6` |
+| `BAS_FRAG_LIMIT` | empty = `25` (DM) / `100` (TDM) | Match goal: kills (DM) or team kills (TDM) that end the match, e.g. `50` |
+| `BAS_TIME_LIMIT` | empty = `10` | Time limit of a match in minutes (1–60), e.g. `15` |
 | `BAS_PUBLIC_IP` | automatic | Only set this if automatic detection is wrong (see logs) |
 
 **Map pool:** If `BAS_MAPS` is empty, the server plays **all official maps** built into the image, starts with a
@@ -143,8 +145,9 @@ hand. Built-in maps:
 Custom maps from `maps/` are only played if they are listed in `BAS_MAPS` (see
 [Maps and the map editor](#maps-and-the-map-editor)).
 
-Fixed values: 10-minute time limit, kill limit 25 (DM) /
-100 team kills (TDM), automatic team balance, ready check and countdown before every match, queue for full
+A match ends when the frag limit or the time limit is reached, whichever comes first.
+
+Fixed values: automatic team balance, ready check and countdown before every match, queue for full
 servers.
 
 After every change to `.env`:
@@ -360,7 +363,7 @@ image**. On every registration the server has to prove, using a one-time random 
 matches the official build byte for byte. A modified or outdated server is rejected and does not appear in
 the server browser – the log then shows `REJECTED`.
 
-Also built in and not configurable: the master server address, the game rules and the protection
+Also built in and not configurable: the master server address, the game rules (apart from frag and time limit) and the protection
 mechanisms. The image runs without root privileges on a read-only file system.
 
 ## Resource usage

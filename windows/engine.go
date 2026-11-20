@@ -212,6 +212,8 @@ func (e *Engine) RunServer(ctx context.Context, c Config, mapsDir string) error 
 		"-e", fmt.Sprintf("BAS_BOTS=%t", c.Bots),
 		"-e", fmt.Sprintf("BAS_MAX_BOTS=%d", c.MaxBots),
 		"-e", fmt.Sprintf("BAS_UDP_PORT=%d", c.Port),
+		"-e", "BAS_FRAG_LIMIT=" + limitValue(c.FragLimit),
+		"-e", "BAS_TIME_LIMIT=" + limitValue(c.TimeLimit),
 		"-e", "BAS_PUBLIC_IP=" + c.PublicIP,
 		"-v", dataVolume + ":/app/data",
 	}

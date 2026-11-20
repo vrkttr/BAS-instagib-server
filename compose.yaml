@@ -17,6 +17,8 @@ services:
       BAS_MAX_PLAYERS: ${BAS_MAX_PLAYERS:-12}
       BAS_BOTS: ${BAS_BOTS:-false}
       BAS_MAX_BOTS: ${BAS_MAX_BOTS:-11}
+      BAS_FRAG_LIMIT: ${BAS_FRAG_LIMIT:-}
+      BAS_TIME_LIMIT: ${BAS_TIME_LIMIT:-}
       BAS_UDP_PORT: ${BAS_PORT:-40000}
       BAS_PUBLIC_IP: ${BAS_PUBLIC_IP:-}
     ports:
