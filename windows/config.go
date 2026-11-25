@@ -24,7 +24,7 @@ type Config struct {
 	MaxPlayers int
 	Bots       bool
 	MaxBots    int
-	FragLimit  int // 0 = default of the mode (25 kills DM / 100 team kills TDM)
+	FragLimit  int // 0 = default of the mode (25 kills DM / 75 team kills TDM)
 	TimeLimit  int // minutes, 0 = default (10)
 	PublicIP   string
 }
@@ -200,7 +200,7 @@ func (c Config) print() {
 	} else {
 		fmt.Printf("  Bots        : off\n")
 	}
-	frags := "(default: 25 kills DM / 100 team kills TDM)"
+	frags := "(default: 25 kills DM / 75 team kills TDM)"
 	if c.FragLimit > 0 {
 		frags = strconv.Itoa(c.FragLimit)
 	}
@@ -235,7 +235,7 @@ func runSetup(c Config) Config {
 		if c.Bots {
 			c.MaxBots = askInt("Max bots (0-11)", c.MaxBots)
 		}
-		c.FragLimit = askInt("Frag limit (0 = default: 25 DM / 100 TDM)", c.FragLimit)
+		c.FragLimit = askInt("Frag limit (0 = default: 25 DM / 75 TDM)", c.FragLimit)
 		c.TimeLimit = askInt("Time limit in minutes (0 = default: 10)", c.TimeLimit)
 		ip := askString("Public IPv4 (empty = automatic, '-' = automatic)", c.PublicIP)
 		if ip == "-" {
