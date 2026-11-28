@@ -16,17 +16,18 @@ This repository contains no program code, only the Docker configuration for the 
    - [Windows: one-click server (.exe)](#windows-one-click-server)
 3. [Settings](#settings)
 4. [Bots](#bots)
-5. [Spectators](#spectators)
-6. [Firewall and ports](#firewall-and-ports)
-7. [Multiple servers on one machine](#multiple-servers-on-one-machine)
-8. [Maps and the map editor](#maps-and-the-map-editor)
-9. [Updates](#updates)
-10. [Reading logs and troubleshooting](#reading-logs-and-troubleshooting)
-11. [Server ID and verification ✓](#server-id-and-verification)
-12. [Why a modified image is not listed](#integrity-check)
-13. [Resource usage](#resource-usage)
-14. [Stopping and removing the server](#stopping-and-removing-the-server)
-15. [Legal](#legal)
+5. [Server admins (in-game console)](#server-admins)
+6. [Spectators](#spectators)
+7. [Firewall and ports](#firewall-and-ports)
+8. [Multiple servers on one machine](#multiple-servers-on-one-machine)
+9. [Maps and the map editor](#maps-and-the-map-editor)
+10. [Updates](#updates)
+11. [Reading logs and troubleshooting](#reading-logs-and-troubleshooting)
+12. [Server ID and verification ✓](#server-id-and-verification)
+13. [Why a modified image is not listed](#integrity-check)
+14. [Resource usage](#resource-usage)
+15. [Stopping and removing the server](#stopping-and-removing-the-server)
+16. [Legal](#legal)
 
 ---
 
@@ -127,6 +128,7 @@ the remaining game rules and security features are built into the image and cann
 | `BAS_BOTS` | `false` | `true` fills empty slots with bots, see [Bots](#bots) |
 | `BAS_MAX_BOTS` | `11` | Upper limit for the number of bots (0–11), e.g. `6` |
 | `BAS_BOT_NAMES` | empty = built-in names | Your own bot names, comma-separated, e.g. `Alpha,Bravo,Charlie` (1–24 letters, digits, spaces, `_ - .` each, max. 64, no duplicates). With more bots than names they get a number (`Alpha 2`) |
+| `BAS_SERVER_ADMINS` | empty | Account IDs of players who may manage the server in-game, comma-separated, e.g. `4711,1234`, see [Server admins](#server-admins) |
 | `BAS_FRAG_LIMIT` | empty = `25` (DM) / `75` (TDM) | Match goal: kills (DM) or team kills (TDM) that end the match, e.g. `50` |
 | `BAS_TIME_LIMIT` | empty = `10` | Time limit of a match in minutes (1–60), e.g. `15` |
 | `BAS_PUBLIC_IP` | automatic | Only set this if automatic detection is wrong (see logs) |
@@ -191,6 +193,35 @@ BAS_BOTS=true
 BAS_MAX_BOTS=6
 BAS_BOT_NAMES=Alpha,Bravo,Charlie,Delta,Echo,Foxtrot
 ```
+
+## Server admins
+
+Put your **account ID** into `BAS_SERVER_ADMINS` (in the game: Account → Overview → *Account ID*, with a copy
+button). Several admins are separated by commas:
+
+```
+BAS_SERVER_ADMINS=4711,1234
+```
+
+Restart the server (`docker compose up -d`). When an admin joins, the in-game **console** (key below Esc:
+`^` on German, `` ` `` on US keyboards) says so, and `help` lists the admin commands:
+
+| Command | Effect |
+|---|---|
+| `status` | Settings and all players with their account IDs |
+| `timelimit <1-120>` | Time limit in minutes – during a match it applies from the next match on |
+| `fraglimit <1-1000\|default>` | Frag limit – during a match it applies from the next match on |
+| `map <name>` | Changes the map right away and restarts the match |
+| `restart` | Restarts the match |
+| `kick <name\|#id>` | Removes a player, who cannot rejoin **this server** for 15 minutes (no penalty anywhere else) |
+| `addbot [1-11]` | Adds bots (default 1) |
+| `kickbot [name\|#id\|all]` | Removes one bot (without a name the last one) or all bots |
+| `bots <on\|off>`, `maxbots <0-11>`, `teambalance <on\|off>` | Same as the variables of the same name |
+
+- Changes made in the console last until the server restarts; after that the values from `.env` apply again.
+- Every admin command is written to the server log with the player's name and account ID.
+- Only registered accounts can be admins, never guests. Admin commands are disabled during clan wars.
+- Bans for the whole game stay with the BAS team; report players in the game.
 
 ## Spectators
 
