@@ -370,13 +370,11 @@ The official maps are built into the image. If `BAS_MAPS` is empty, the server p
 with a random one and lets the players vote after every match; new official maps join the pool automatically
 with every update.
 
-| Identifier | Map | | Identifier | Map |
-|---|---|---|---|---|
-| `dark_church` | Dark Church | | `stone_tech` | Stone Tech |
-| `iron_lung` | Iron Lung | | `sulfur_gate` | Sulfur Gate |
-| `lakeside_prison` | Lakeside Prison | | `toxic_core` | Toxic Core |
-| `medieval_techno` | Medieval Techno | | `train_wrack` | Train Wrack |
-| `neo_city` | Neo City | | | |
+<table>
+<tr><td align="center" width="33%"><img src="images/maps/dark_church.jpg" alt="Dark Church" width="260"><br><b>Dark Church</b><br><code>dark_church</code></td><td align="center" width="33%"><img src="images/maps/iron_lung.jpg" alt="Iron Lung" width="260"><br><b>Iron Lung</b><br><code>iron_lung</code></td><td align="center" width="33%"><img src="images/maps/lakeside_prison.jpg" alt="Lakeside Prison" width="260"><br><b>Lakeside Prison</b><br><code>lakeside_prison</code></td></tr>
+<tr><td align="center" width="33%"><img src="images/maps/medieval_techno.jpg" alt="Medieval Techno" width="260"><br><b>Medieval Techno</b><br><code>medieval_techno</code></td><td align="center" width="33%"><img src="images/maps/neo_city.jpg" alt="Neo City" width="260"><br><b>Neo City</b><br><code>neo_city</code></td><td align="center" width="33%"><img src="images/maps/stone_tech.jpg" alt="Stone Tech" width="260"><br><b>Stone Tech</b><br><code>stone_tech</code></td></tr>
+<tr><td align="center" width="33%"><img src="images/maps/sulfur_gate.jpg" alt="Sulfur Gate" width="260"><br><b>Sulfur Gate</b><br><code>sulfur_gate</code></td><td align="center" width="33%"><img src="images/maps/toxic_core.jpg" alt="Toxic Core" width="260"><br><b>Toxic Core</b><br><code>toxic_core</code></td><td align="center" width="33%"><img src="images/maps/train_wrack.jpg" alt="Train Wrack" width="260"><br><b>Train Wrack</b><br><code>train_wrack</code></td></tr>
+</table>
 
 If you set `BAS_MAPS`, only your selection is played – new official maps then have to be added by hand.
 
