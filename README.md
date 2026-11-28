@@ -130,6 +130,9 @@ the remaining game rules and security features are built into the image and cann
 | `BAS_MAX_BOTS` | `11` | Upper limit for the number of bots (0–11), e.g. `6` |
 | `BAS_BOT_NAMES` | empty = built-in names | Your own bot names, comma-separated, e.g. `Alpha,Bravo,Charlie` (1–24 letters, digits, spaces, `_ - .` each, max. 64, no duplicates). With more bots than names they get a number (`Alpha 2`) |
 | `BAS_SERVER_ADMINS` | empty | Account IDs of players who may manage the server in-game, comma-separated, e.g. `4711,1234`, see [Server admins](#server-admins) |
+| `BAS_RESERVED_SLOTS` | `0` | Slots kept free for the accounts in `BAS_RESERVED_IDS` and for all server admins (must be lower than `BAS_MAX_PLAYERS`) |
+| `BAS_RESERVED_IDS` | empty | Account IDs that may use the reserved slots, comma-separated |
+| `BAS_COUNTRY` | empty | Two-letter country code (`DE`, `US`, `FR` …) shown in front of your server name in the server browser |
 | `BAS_MOTD` | empty | Welcome message, lines separated by `\n`, colours `^0`–`^9`, see [below](#welcome-message-announcements-and-player-stats) |
 | `BAS_BROADCAST` | empty | Announcements, lines separated by `\n`; one line every `BAS_BROADCAST_INTERVAL` minutes |
 | `BAS_BROADCAST_INTERVAL` | `5` | Minutes between two announcements (1–120) |
@@ -228,6 +231,10 @@ Restart the server (`docker compose up -d`). When an admin joins, the in-game **
 - Every admin command is written to the server log with the player's name and account ID.
 - Only registered accounts can be admins, never guests. Admin commands are disabled during clan wars.
 - Bans for the whole game stay with the BAS team; report players in the game.
+
+**Reserved slots:** with `BAS_RESERVED_SLOTS=2` and `BAS_RESERVED_IDS=4711,1234` the last two slots stay free for
+those accounts and for every server admin. Everybody else waits in the queue once only reserved slots are left;
+players with a reserved slot skip the queue. The server browser shows such a server as full for everybody else.
 
 ## Welcome message, announcements and player stats
 

@@ -26,6 +26,9 @@ type Config struct {
 	MaxBots    int
 	BotNames   string // comma-separated, empty = built-in names
 	Admins     string // account IDs, comma-separated
+	ResSlots   string // reserved slots, empty = 0
+	ResIDs     string // account IDs for reserved slots
+	Country    string // two-letter country code
 	Motd       string // lines separated by \n
 	Broadcast  string // lines separated by \n
 	BcInterval string // minutes, empty = default (5)
@@ -101,6 +104,12 @@ func loadConfig(path string) (Config, error) {
 			c.BotNames = v
 		case "BAS_SERVER_ADMINS":
 			c.Admins = v
+		case "BAS_RESERVED_SLOTS":
+			c.ResSlots = v
+		case "BAS_RESERVED_IDS":
+			c.ResIDs = v
+		case "BAS_COUNTRY":
+			c.Country = v
 		case "BAS_MOTD":
 			c.Motd = v
 		case "BAS_BROADCAST":
@@ -140,6 +149,9 @@ func saveConfig(path string, c Config) error {
 	fmt.Fprintf(&b, "BAS_MAX_BOTS=%d\r\n", c.MaxBots)
 	fmt.Fprintf(&b, "BAS_BOT_NAMES=%s\r\n", c.BotNames)
 	fmt.Fprintf(&b, "BAS_SERVER_ADMINS=%s\r\n", c.Admins)
+	fmt.Fprintf(&b, "BAS_RESERVED_SLOTS=%s\r\n", c.ResSlots)
+	fmt.Fprintf(&b, "BAS_RESERVED_IDS=%s\r\n", c.ResIDs)
+	fmt.Fprintf(&b, "BAS_COUNTRY=%s\r\n", c.Country)
 	fmt.Fprintf(&b, "BAS_MOTD=%s\r\n", c.Motd)
 	fmt.Fprintf(&b, "BAS_BROADCAST=%s\r\n", c.Broadcast)
 	fmt.Fprintf(&b, "BAS_BROADCAST_INTERVAL=%s\r\n", c.BcInterval)
