@@ -24,8 +24,9 @@ type Config struct {
 	MaxPlayers int
 	Bots       bool
 	MaxBots    int
-	FragLimit  int // 0 = default of the mode (25 kills DM / 75 team kills TDM)
-	TimeLimit  int // minutes, 0 = default (10)
+	BotNames   string // comma-separated, empty = built-in names
+	FragLimit  int    // 0 = default of the mode (25 kills DM / 75 team kills TDM)
+	TimeLimit  int    // minutes, 0 = default (10)
 	PublicIP   string
 }
 
@@ -90,6 +91,8 @@ func loadConfig(path string) (Config, error) {
 			if n, err := strconv.Atoi(v); err == nil {
 				c.MaxBots = n
 			}
+		case "BAS_BOT_NAMES":
+			c.BotNames = v
 		case "BAS_FRAG_LIMIT":
 			if n, err := strconv.Atoi(v); err == nil {
 				c.FragLimit = n
@@ -117,6 +120,7 @@ func saveConfig(path string, c Config) error {
 	fmt.Fprintf(&b, "BAS_MAX_PLAYERS=%d\r\n", c.MaxPlayers)
 	fmt.Fprintf(&b, "BAS_BOTS=%t\r\n", c.Bots)
 	fmt.Fprintf(&b, "BAS_MAX_BOTS=%d\r\n", c.MaxBots)
+	fmt.Fprintf(&b, "BAS_BOT_NAMES=%s\r\n", c.BotNames)
 	fmt.Fprintf(&b, "BAS_FRAG_LIMIT=%s\r\n", limitValue(c.FragLimit))
 	fmt.Fprintf(&b, "BAS_TIME_LIMIT=%s\r\n", limitValue(c.TimeLimit))
 	fmt.Fprintf(&b, "BAS_PUBLIC_IP=%s\r\n", c.PublicIP)

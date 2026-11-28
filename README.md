@@ -126,6 +126,7 @@ the remaining game rules and security features are built into the image and cann
 | `BAS_MAX_PLAYERS` | `12` | Player limit (1–12) |
 | `BAS_BOTS` | `false` | `true` fills empty slots with bots, see [Bots](#bots) |
 | `BAS_MAX_BOTS` | `11` | Upper limit for the number of bots (0–11), e.g. `6` |
+| `BAS_BOT_NAMES` | empty = built-in names | Your own bot names, comma-separated, e.g. `Alpha,Bravo,Charlie` (1–24 letters, digits, spaces, `_ - .` each, max. 64, no duplicates). With more bots than names they get a number (`Alpha 2`) |
 | `BAS_FRAG_LIMIT` | empty = `25` (DM) / `75` (TDM) | Match goal: kills (DM) or team kills (TDM) that end the match, e.g. `50` |
 | `BAS_TIME_LIMIT` | empty = `10` | Time limit of a match in minutes (1–60), e.g. `15` |
 | `BAS_PUBLIC_IP` | automatic | Only set this if automatic detection is wrong (see logs) |
@@ -188,6 +189,7 @@ Example `.env` for a server that never feels empty but leaves room for players:
 ```
 BAS_BOTS=true
 BAS_MAX_BOTS=6
+BAS_BOT_NAMES=Alpha,Bravo,Charlie,Delta,Echo,Foxtrot
 ```
 
 ## Spectators
