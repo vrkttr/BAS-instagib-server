@@ -26,6 +26,11 @@ type Config struct {
 	MaxBots    int
 	BotNames   string // comma-separated, empty = built-in names
 	Admins     string // account IDs, comma-separated
+	Motd       string // lines separated by \n
+	Broadcast  string // lines separated by \n
+	BcInterval string // minutes, empty = default (5)
+	BcOrder    string // sequential or random
+	JoinStats  string // true or false, empty = default (true)
 	FragLimit  int    // 0 = default of the mode (25 kills DM / 75 team kills TDM)
 	TimeLimit  int    // minutes, 0 = default (10)
 	PublicIP   string
@@ -96,6 +101,16 @@ func loadConfig(path string) (Config, error) {
 			c.BotNames = v
 		case "BAS_SERVER_ADMINS":
 			c.Admins = v
+		case "BAS_MOTD":
+			c.Motd = v
+		case "BAS_BROADCAST":
+			c.Broadcast = v
+		case "BAS_BROADCAST_INTERVAL":
+			c.BcInterval = v
+		case "BAS_BROADCAST_ORDER":
+			c.BcOrder = v
+		case "BAS_JOIN_STATS":
+			c.JoinStats = v
 		case "BAS_FRAG_LIMIT":
 			if n, err := strconv.Atoi(v); err == nil {
 				c.FragLimit = n
@@ -125,6 +140,11 @@ func saveConfig(path string, c Config) error {
 	fmt.Fprintf(&b, "BAS_MAX_BOTS=%d\r\n", c.MaxBots)
 	fmt.Fprintf(&b, "BAS_BOT_NAMES=%s\r\n", c.BotNames)
 	fmt.Fprintf(&b, "BAS_SERVER_ADMINS=%s\r\n", c.Admins)
+	fmt.Fprintf(&b, "BAS_MOTD=%s\r\n", c.Motd)
+	fmt.Fprintf(&b, "BAS_BROADCAST=%s\r\n", c.Broadcast)
+	fmt.Fprintf(&b, "BAS_BROADCAST_INTERVAL=%s\r\n", c.BcInterval)
+	fmt.Fprintf(&b, "BAS_BROADCAST_ORDER=%s\r\n", c.BcOrder)
+	fmt.Fprintf(&b, "BAS_JOIN_STATS=%s\r\n", c.JoinStats)
 	fmt.Fprintf(&b, "BAS_FRAG_LIMIT=%s\r\n", limitValue(c.FragLimit))
 	fmt.Fprintf(&b, "BAS_TIME_LIMIT=%s\r\n", limitValue(c.TimeLimit))
 	fmt.Fprintf(&b, "BAS_PUBLIC_IP=%s\r\n", c.PublicIP)

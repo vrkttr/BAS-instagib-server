@@ -17,17 +17,18 @@ This repository contains no program code, only the Docker configuration for the 
 3. [Settings](#settings)
 4. [Bots](#bots)
 5. [Server admins (in-game console)](#server-admins)
-6. [Spectators](#spectators)
-7. [Firewall and ports](#firewall-and-ports)
-8. [Multiple servers on one machine](#multiple-servers-on-one-machine)
-9. [Maps and the map editor](#maps-and-the-map-editor)
-10. [Updates](#updates)
-11. [Reading logs and troubleshooting](#reading-logs-and-troubleshooting)
-12. [Server ID and verification ✓](#server-id-and-verification)
-13. [Why a modified image is not listed](#integrity-check)
-14. [Resource usage](#resource-usage)
-15. [Stopping and removing the server](#stopping-and-removing-the-server)
-16. [Legal](#legal)
+6. [Welcome message, announcements and player stats](#welcome-message-announcements-and-player-stats)
+7. [Spectators](#spectators)
+8. [Firewall and ports](#firewall-and-ports)
+9. [Multiple servers on one machine](#multiple-servers-on-one-machine)
+10. [Maps and the map editor](#maps-and-the-map-editor)
+11. [Updates](#updates)
+12. [Reading logs and troubleshooting](#reading-logs-and-troubleshooting)
+13. [Server ID and verification ✓](#server-id-and-verification)
+14. [Why a modified image is not listed](#integrity-check)
+15. [Resource usage](#resource-usage)
+16. [Stopping and removing the server](#stopping-and-removing-the-server)
+17. [Legal](#legal)
 
 ---
 
@@ -129,6 +130,11 @@ the remaining game rules and security features are built into the image and cann
 | `BAS_MAX_BOTS` | `11` | Upper limit for the number of bots (0–11), e.g. `6` |
 | `BAS_BOT_NAMES` | empty = built-in names | Your own bot names, comma-separated, e.g. `Alpha,Bravo,Charlie` (1–24 letters, digits, spaces, `_ - .` each, max. 64, no duplicates). With more bots than names they get a number (`Alpha 2`) |
 | `BAS_SERVER_ADMINS` | empty | Account IDs of players who may manage the server in-game, comma-separated, e.g. `4711,1234`, see [Server admins](#server-admins) |
+| `BAS_MOTD` | empty | Welcome message, lines separated by `\n`, colours `^0`–`^9`, see [below](#welcome-message-announcements-and-player-stats) |
+| `BAS_BROADCAST` | empty | Announcements, lines separated by `\n`; one line every `BAS_BROADCAST_INTERVAL` minutes |
+| `BAS_BROADCAST_INTERVAL` | `5` | Minutes between two announcements (1–120) |
+| `BAS_BROADCAST_ORDER` | `sequential` | `sequential` or `random` |
+| `BAS_JOIN_STATS` | `true` | Shows each player their own stats on your server a few seconds after joining |
 | `BAS_FRAG_LIMIT` | empty = `25` (DM) / `75` (TDM) | Match goal: kills (DM) or team kills (TDM) that end the match, e.g. `50` |
 | `BAS_TIME_LIMIT` | empty = `10` | Time limit of a match in minutes (1–60), e.g. `15` |
 | `BAS_PUBLIC_IP` | automatic | Only set this if automatic detection is wrong (see logs) |
@@ -222,6 +228,26 @@ Restart the server (`docker compose up -d`). When an admin joins, the in-game **
 - Every admin command is written to the server log with the player's name and account ID.
 - Only registered accounts can be admins, never guests. Admin commands are disabled during clan wars.
 - Bans for the whole game stay with the BAS team; report players in the game.
+
+## Welcome message, announcements and player stats
+
+Everything appears as a chat line starting with `[Server]` and fades out like normal chat. Colour codes `^0`–`^9`
+work (`^1` red, `^2` green, `^3` yellow, `^4` blue, `^5` cyan, `^6` pink, `^7` white, `^8` orange, `^9`/`^0` grey).
+
+```
+BAS_MOTD=Welcome to ^2My BAS Server^7!\nNo camping, have fun.\nDiscord: ^5discord.gg/example
+BAS_BROADCAST=Vote for the next map after each match!\nJoin our Discord: ^5discord.gg/example
+BAS_BROADCAST_INTERVAL=5
+BAS_BROADCAST_ORDER=random
+```
+
+- **Welcome message (`BAS_MOTD`)**: up to 8 lines of 120 characters, shown when a player joins and after every
+  map change.
+- **Announcements (`BAS_BROADCAST`)**: up to 20 lines of 160 characters. Every `BAS_BROADCAST_INTERVAL` minutes
+  one line goes to everybody, in order or at random – only while at least one player is on the server.
+- **Player stats (`BAS_JOIN_STATS`, on by default)**: 3 seconds after joining, every signed-in player sees their
+  own playtime and frags on your server, their best accuracy and best K/D here, and their total kills. Only
+  verified servers (✓) collect stats, so on other servers this line does not appear.
 
 ## Spectators
 
