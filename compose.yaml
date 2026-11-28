@@ -29,6 +29,7 @@ services:
       BAS_JOIN_STATS: ${BAS_JOIN_STATS:-true}
       BAS_FRAG_LIMIT: ${BAS_FRAG_LIMIT:-}
       BAS_TIME_LIMIT: ${BAS_TIME_LIMIT:-}
+      BAS_TEAM_BALANCE: ${BAS_TEAM_BALANCE:-true}
       BAS_UDP_PORT: ${BAS_PORT:-40000}
       BAS_PUBLIC_IP: ${BAS_PUBLIC_IP:-}
     ports:

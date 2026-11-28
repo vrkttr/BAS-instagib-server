@@ -216,6 +216,7 @@ func (e *Engine) RunServer(ctx context.Context, c Config, mapsDir string) error 
 		"-e", "BAS_RESERVED_SLOTS=" + c.ResSlots,
 		"-e", "BAS_RESERVED_IDS=" + c.ResIDs,
 		"-e", "BAS_COUNTRY=" + c.Country,
+		"-e", "BAS_TEAM_BALANCE=" + c.TeamBal,
 		"-e", "BAS_MOTD=" + c.Motd,
 		"-e", "BAS_BROADCAST=" + c.Broadcast,
 		"-e", "BAS_BROADCAST_INTERVAL=" + c.BcInterval,

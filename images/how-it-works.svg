@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" width="960" height="360" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <title>How a BAS: Instagib community server is connected</title>
+  <rect width="960" height="360" fill="#0b0c0e"/>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#c3f400"/></marker>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#b9b3a3"/></marker>
+  </defs>
+  <g>
+    <rect x="40" y="130" width="220" height="100" fill="#1e2024" stroke="#e6e1d3" stroke-opacity="0.35"/>
+    <text x="150" y="172" fill="#e6e1d3" font-size="20" font-weight="700" text-anchor="middle">Players</text>
+    <text x="150" y="198" fill="#b9b3a3" font-size="14" text-anchor="middle">browser or desktop app</text>
+  </g>
+  <g>
+    <rect x="370" y="30" width="220" height="100" fill="#1e2024" stroke="#e6e1d3" stroke-opacity="0.35"/>
+    <text x="480" y="72" fill="#e6e1d3" font-size="20" font-weight="700" text-anchor="middle">Master server</text>
+    <text x="480" y="98" fill="#b9b3a3" font-size="14" text-anchor="middle">server list · sign-in · stats</text>
+  </g>
+  <g>
+    <rect x="700" y="130" width="220" height="100" fill="#1e2024" stroke="#c3f400" stroke-width="2"/>
+    <text x="810" y="172" fill="#c3f400" font-size="20" font-weight="700" text-anchor="middle">Your server</text>
+    <text x="810" y="198" fill="#b9b3a3" font-size="14" text-anchor="middle">this Docker image</text>
+  </g>
+  <path d="M260 150 L370 95" stroke="#b9b3a3" stroke-width="2" fill="none" marker-end="url(#b)" marker-start="url(#b)"/>
+  <text x="250" y="105" fill="#b9b3a3" font-size="13">find servers, join</text>
+  <path d="M700 150 L590 95" stroke="#b9b3a3" stroke-width="2" fill="none" marker-end="url(#b)" marker-start="url(#b)"/>
+  <text x="632" y="105" fill="#b9b3a3" font-size="13">registers itself (outgoing)</text>
+  <path d="M260 200 L700 200" stroke="#c3f400" stroke-width="3" fill="none" marker-end="url(#a)" marker-start="url(#a)"/>
+  <text x="480" y="190" fill="#c3f400" font-size="15" font-weight="700" text-anchor="middle">game traffic: one UDP port (e.g. 40000)</text>
+  <text x="480" y="300" fill="#e6e1d3" font-size="15" text-anchor="middle">No domain, no certificate, no open TCP port – only one UDP port per server.</text>
+  <text x="480" y="326" fill="#b9b3a3" font-size="13" text-anchor="middle">Players load custom maps automatically through the master server.</text>
+</svg>

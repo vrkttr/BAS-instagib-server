@@ -29,12 +29,13 @@ type Config struct {
 	ResSlots   string // reserved slots, empty = 0
 	ResIDs     string // account IDs for reserved slots
 	Country    string // two-letter country code
+	TeamBal    string // true or false, empty = default (true)
 	Motd       string // lines separated by \n
 	Broadcast  string // lines separated by \n
 	BcInterval string // minutes, empty = default (5)
 	BcOrder    string // sequential or random
 	JoinStats  string // true or false, empty = default (true)
-	FragLimit  int    // 0 = default of the mode (25 kills DM / 75 team kills TDM)
+	FragLimit  int    // 0 = default of the mode (25 kills DM / 75 team kills TDM / 10 duel)
 	TimeLimit  int    // minutes, 0 = default (10)
 	PublicIP   string
 }
@@ -110,6 +111,8 @@ func loadConfig(path string) (Config, error) {
 			c.ResIDs = v
 		case "BAS_COUNTRY":
 			c.Country = v
+		case "BAS_TEAM_BALANCE":
+			c.TeamBal = v
 		case "BAS_MOTD":
 			c.Motd = v
 		case "BAS_BROADCAST":
@@ -152,6 +155,7 @@ func saveConfig(path string, c Config) error {
 	fmt.Fprintf(&b, "BAS_RESERVED_SLOTS=%s\r\n", c.ResSlots)
 	fmt.Fprintf(&b, "BAS_RESERVED_IDS=%s\r\n", c.ResIDs)
 	fmt.Fprintf(&b, "BAS_COUNTRY=%s\r\n", c.Country)
+	fmt.Fprintf(&b, "BAS_TEAM_BALANCE=%s\r\n", c.TeamBal)
 	fmt.Fprintf(&b, "BAS_MOTD=%s\r\n", c.Motd)
 	fmt.Fprintf(&b, "BAS_BROADCAST=%s\r\n", c.Broadcast)
 	fmt.Fprintf(&b, "BAS_BROADCAST_INTERVAL=%s\r\n", c.BcInterval)
@@ -192,8 +196,8 @@ func (c Config) validate() error {
 	if c.FragLimit < 0 || c.FragLimit > 999 {
 		return fmt.Errorf("BAS_FRAG_LIMIT must be between 1 and 999, or empty for the default")
 	}
-	if c.TimeLimit < 0 || c.TimeLimit > 60 {
-		return fmt.Errorf("BAS_TIME_LIMIT must be between 1 and 60 minutes, or empty for the default")
+	if c.TimeLimit < 0 || c.TimeLimit > 120 {
+		return fmt.Errorf("BAS_TIME_LIMIT must be between 1 and 120 minutes, or empty for the default")
 	}
 	if strings.TrimSpace(c.Maps) != "" {
 		for _, m := range strings.Split(c.Maps, ",") {
@@ -240,7 +244,7 @@ func (c Config) print() {
 	} else {
 		fmt.Printf("  Bots        : off\n")
 	}
-	frags := "(default: 25 kills DM / 75 team kills TDM)"
+	frags := "(default: 25 kills DM / 75 team kills TDM / 10 kills duel)"
 	if c.FragLimit > 0 {
 		frags = strconv.Itoa(c.FragLimit)
 	}
