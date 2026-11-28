@@ -177,8 +177,8 @@ func (c Config) validate() error {
 	if utf8.RuneCountInString(c.ServerName) > 48 {
 		return fmt.Errorf("BAS_SERVER_NAME is longer than 48 characters")
 	}
-	if c.Mode != "dm" && c.Mode != "tdm" {
-		return fmt.Errorf("BAS_MODE must be dm or tdm")
+	if c.Mode != "dm" && c.Mode != "tdm" && c.Mode != "duel" {
+		return fmt.Errorf("BAS_MODE must be dm, tdm or duel")
 	}
 	if c.Port < 1024 || c.Port > 65535 {
 		return fmt.Errorf("BAS_PORT must be between 1024 and 65535")
@@ -259,7 +259,7 @@ func runSetup(c Config) Config {
 	fmt.Println("=== Server settings ===  (press Enter to keep the value in [brackets])")
 	for {
 		c.ServerName = askString("Server name (max. 48 characters)", c.ServerName)
-		c.Mode = strings.ToLower(askString("Game mode: dm (deathmatch) or tdm (team deathmatch)", c.Mode))
+		c.Mode = strings.ToLower(askString("Game mode: dm (deathmatch), tdm (team deathmatch) or duel (1v1)", c.Mode))
 		c.Port = askInt("UDP port", c.Port)
 		pwDefault := c.Password
 		c.Password = askString("Password (empty = public server, '-' = remove password)", pwDefault)

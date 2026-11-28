@@ -17,18 +17,19 @@ This repository contains no program code, only the Docker configuration for the 
 3. [Settings](#settings)
 4. [Bots](#bots)
 5. [Server admins (in-game console)](#server-admins)
-6. [Welcome message, announcements and player stats](#welcome-message-announcements-and-player-stats)
-7. [Spectators](#spectators)
-8. [Firewall and ports](#firewall-and-ports)
-9. [Multiple servers on one machine](#multiple-servers-on-one-machine)
-10. [Maps and the map editor](#maps-and-the-map-editor)
-11. [Updates](#updates)
-12. [Reading logs and troubleshooting](#reading-logs-and-troubleshooting)
-13. [Server ID and verification ✓](#server-id-and-verification)
-14. [Why a modified image is not listed](#integrity-check)
-15. [Resource usage](#resource-usage)
-16. [Stopping and removing the server](#stopping-and-removing-the-server)
-17. [Legal](#legal)
+6. [Duel](#duel)
+7. [Welcome message, announcements and player stats](#welcome-message-announcements-and-player-stats)
+8. [Spectators](#spectators)
+9. [Firewall and ports](#firewall-and-ports)
+10. [Multiple servers on one machine](#multiple-servers-on-one-machine)
+11. [Maps and the map editor](#maps-and-the-map-editor)
+12. [Updates](#updates)
+13. [Reading logs and troubleshooting](#reading-logs-and-troubleshooting)
+14. [Server ID and verification ✓](#server-id-and-verification)
+15. [Why a modified image is not listed](#integrity-check)
+16. [Resource usage](#resource-usage)
+17. [Stopping and removing the server](#stopping-and-removing-the-server)
+18. [Legal](#legal)
 
 ---
 
@@ -121,7 +122,7 @@ the remaining game rules and security features are built into the image and cann
 | Variable | Default | Meaning |
 |---|---|---|
 | `BAS_SERVER_NAME` | `BAS Community Server` | Name in the server browser (max. 48 characters) |
-| `BAS_MODE` | `dm` | Game mode: `dm` (deathmatch) or `tdm` (team deathmatch) |
+| `BAS_MODE` | `dm` | Game mode: `dm` (deathmatch), `tdm` (team deathmatch) or `duel` (1v1, see [Duel](#duel)) |
 | `BAS_PORT` | `40000` | UDP port of the server (same port outside and inside) |
 | `BAS_PASSWORD` | empty | Password; empty = public server |
 | `BAS_MAPS` | empty = all official maps | Map pool, comma-separated (e.g. `sulfur_gate,stone_tech,mymap`); empty = automatic pool, see below. Players vote after every match |
@@ -235,6 +236,14 @@ Restart the server (`docker compose up -d`). When an admin joins, the in-game **
 **Reserved slots:** with `BAS_RESERVED_SLOTS=2` and `BAS_RESERVED_IDS=4711,1234` the last two slots stay free for
 those accounts and for every server admin. Everybody else waits in the queue once only reserved slots are left;
 players with a reserved slot skip the queue. The server browser shows such a server as full for everybody else.
+
+## Duel
+
+`BAS_MODE=duel` runs a 1v1 server like in Quake 3: two players fight, the winner stays and the loser goes to the
+back of the queue. Everybody else watches as a spectator while waiting – joining a running duel puts you into
+the queue automatically, and the game switches you in when it is your turn. Frag limit 10 unless you set
+`BAS_FRAG_LIMIT`; `BAS_MAX_PLAYERS` is ignored. Duels have their own leaderboard. With `BAS_BOTS=true` a lone
+player fights a bot until somebody joins.
 
 ## Welcome message, announcements and player stats
 
@@ -455,5 +464,9 @@ docker compose down -v
 
 © 2026 David Vierkötter ("VRKTTR"). All rights reserved. The image may only be used unmodified to run a
 BAS: Instagib server. See [LICENSE](LICENSE).
+
+The image contains third-party components under their own licenses (among them node-datachannel and
+libdatachannel under the Mozilla Public License 2.0). The full list with all license texts is in the image at
+`/app/third-party-licenses.txt` and online at <https://bas-instagib.com/third-party-licenses.txt>.
 
 Official website: <https://bas-instagib.com>
